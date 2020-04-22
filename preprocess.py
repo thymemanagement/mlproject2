@@ -27,7 +27,7 @@ def random_batches(num_batches, batch_size):
     return batches
 
 #generalized parse training function. Uses a generator selectors to determine which rows to parse.
-def parse_selected_training_data(csv_path, img_path, selectors):
+def parse_training_selected(csv_path, img_path, selectors):
     png_array = []
     y_array = []
     with open(csv_path) as csv_file:
@@ -38,21 +38,29 @@ def parse_selected_training_data(csv_path, img_path, selectors):
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
 
-#Parses a csv file and produces two lists that contain image data and label data provided by the csv.
-#Since the csv file and the image data can be quite large, this function only parses data from a subset of the rows.
-#csv_path: path of the csv file, img_path: path to the image directory
-#start: integer containing first row to parse, end: integer containing last row to parse
-def parse_training_range(csv_path, img_path, start, end):
-    return parse_selected_training_data(csv_path, img_path, chain(repeat(False, start), repeat(True, end - start)))
-
 #Parses a given csv file and produces two parallel lists that contain image data and label data provided by the csv.
 #The data parsed is given by batch_num and batches
 #batches is a list where each index represents a row in the csv and each index has a number which is the rows batch number
 #batch_num is the batch number currently being parsed. If an index in batches has this batch_number, it will be included in the output
 def parse_training_batch(csv_path, img_path, batch_num, batches):
-    return parse_selected_training_data(csv_path, img_path, map(lambda x : x == batch_num, batches))
+    return parse_training_selected(csv_path, img_path, map(lambda x : x == batch_num, batches))
+
+#Parses a csv file and produces two lists that contain image data and label data provided by the csv.
+#Since the csv file and the image data can be quite large, this function only parses data from a subset of the rows.
+#csv_path: path of the csv file, img_path: path to the image directory
+#start: integer containing first row to parse, end: integer containing last row to parse
+def parse_training_range(csv_path, img_path, start, end):
+    png_array = []
+    y_array = []
+    with open(csv_path) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader)
+        for row in islice(csv_reader, start, end):
+            png_array.append(cv2.imread(img_path + row[0]))
+            y_array.append(Label(row[1]))
+    return (np.asarray(png_array), np.asarray(y_array))
 
 #Parses the entire given csv file and image path into two parallel lists
 #Do not recommend using. Will probably take up too much space and take a long time
 def parse_training_all(csv_path, img_path):
-    return parse_selected_training_data(csv_path, img_path, repeat(True))
+    return parse_training_selected(csv_path, img_path, repeat(True))
