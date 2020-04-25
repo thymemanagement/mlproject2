@@ -37,7 +37,6 @@ def parse_training_selected(csv_path, img_path, selectors):
     with open(csv_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
-
         for row in compress(csv_reader, selectors):
             image_path = os.path.join(img_path, row[0])
             png_array.append(cv2.imread(image_path))
@@ -62,8 +61,7 @@ def parse_training_range(csv_path, img_path, start, end):
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
         for row in islice(csv_reader, start, end):
-            IMG_PATH = os.path.join(img_path, row[0])
-            png_array.append(cv2.imread(IMG_PATH))
+            png_array.append(cv2.imread(img_path + row[0]))
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
 
