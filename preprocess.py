@@ -6,6 +6,10 @@ import random
 import cv2
 import numpy as np
 
+from numpy import asarray
+from numpy import save
+from numpy import load
+
 #class to identify labels. Label.X produces the X label as does Label("x"). Label("x") can be used to verify label input.
 class Label(Enum):
     AIRPLANE = "airplane"
@@ -33,7 +37,8 @@ def parse_training_selected(csv_path, img_path, selectors):
     with open(csv_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
-        for row in compress(csv_reader, selectors):
+        for row in csv_reader:
+            print("Processing file", row[0])
             png_array.append(cv2.imread(img_path + row[0]))
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
@@ -64,3 +69,32 @@ def parse_training_range(csv_path, img_path, start, end):
 #Do not recommend using. Will probably take up too much space and take a long time
 def parse_training_all(csv_path, img_path):
     return parse_training_selected(csv_path, img_path, repeat(True))
+
+
+# load all of the train labels and images into np arrays "images" and "labels"
+csv_path = './Train_Labels.csv'
+img_path = './Train_Image/Train_Image/'
+images, labels = parse_training_all(csv_path, img_path)
+
+# reformat Label objects into strings for saving into .npy files
+string_labels = []
+for i in range(labels.size):
+  string_labels.append(labels[i].value)
+labels = np.asarray(string_labels)
+
+# save the data in .npy files if valid
+train_images_path = './train_images.npy'
+train_labels_path = './train_labels.npy'
+save(train_images_path, images)
+save(train_labels_path, labels)
+
+# load it back in to test
+x_train = load(train_images_path)
+y_train = load(train_labels_path)
+
+print('x_train.shape =', x_train.shape)
+print('y_train.shape =', y_train.shape)
+
+# plot first image with its label to check if valid
+plt.imshow(x_train[0])
+print(y_train[0])
