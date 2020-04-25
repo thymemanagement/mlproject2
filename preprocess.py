@@ -70,9 +70,8 @@ def parse_training_range(csv_path, img_path, start, end):
 def parse_training_all(csv_path, img_path):
     return parse_training_selected(csv_path, img_path, repeat(True))
 
-def main():
-    png_array, y_array = parse_training_range('Train_Labels.csv', TEST_IMG_DIR, 4, 5)
-    print(png_array, y_array)
+# def main():
+#     png_array, y_array = parse_training_range('Train_Labels.csv', TEST_IMG_DIR, 4, 5)
     
-if (__name__ == '__main__'):
-    main()
+# if (__name__ == '__main__'):
+#     main()
