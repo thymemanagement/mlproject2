@@ -9,7 +9,15 @@ import random
 import cv2
 import numpy as np
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+from numpy import load
+=======
 TEST_IMG_DIR = os.path.join('Test_Image', 'Test_Image')
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
+=======
+TEST_IMG_DIR = os.path.join('Test_Image', 'Test_Image')
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
 
 #class to identify labels. Label.X produces the X label as does Label("x"). Label("x") can be used to verify label input.
 class Label(Enum):
@@ -38,9 +46,21 @@ def parse_training_selected(csv_path, img_path, selectors):
     with open(csv_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
+<<<<<<< HEAD
+<<<<<<< HEAD
+        for row in compress(csv_reader,selectors):
+            print("Processing file", row[0])
+            png_array.append(cv2.imread(img_path + row[0]))
+=======
         for row in compress(csv_reader, selectors):
             IMG_PATH = os.path.join(img_path, row[0])
             png_array.append(cv2.imread(IMG_PATH))
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
+=======
+        for row in compress(csv_reader, selectors):
+            IMG_PATH = os.path.join(img_path, row[0])
+            png_array.append(cv2.imread(IMG_PATH))
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
 
@@ -72,6 +92,14 @@ def parse_training_range(csv_path, img_path, start, end):
 def parse_training_all(csv_path, img_path):
     return parse_training_selected(csv_path, img_path, repeat(True))
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+def load_np_data(image_path, labels_path):
+    x_train = load(image_path)
+    y_train = load(labels_path)
+    return (load(image_path), load(labels_path))
+
+=======
 def main():
     # load all of the train labels and images into np arrays "images" and "labels"
     csv_path = 'Train_Labels.csv'
@@ -95,8 +123,38 @@ def main():
     x_train = load(train_images_path)
     y_train = load(train_labels_path)
 
+=======
+def main():
+    # load all of the train labels and images into np arrays "images" and "labels"
+    csv_path = 'Train_Labels.csv'
+    img_path = TEST_IMG_DIR
+    images, labels = parse_training_all(csv_path, img_path)
+
+    # reformat Label objects into strings for saving into .npy files
+    string_labels = []
+    for i in range(labels.size):
+        string_labels.append(labels[i].value)
+    
+    labels = np.asarray(string_labels)
+
+    # save the data in .npy files if valid
+    train_images_path = 'train_images.npy'
+    train_labels_path = 'train_labels.npy'
+    # save(train_images_path, images)
+    # save(train_labels_path, labels)
+
+    # load it back in to test
+    x_train = load(train_images_path)
+    y_train = load(train_labels_path)
+
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
     # plot first image with its label to check if valid
     plt.imshow(x_train[0])
     
 if (__name__ == '__main__'):
+<<<<<<< HEAD
     main()
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
+=======
+    main()
+>>>>>>> 690c98a601b041bff6c2c6b5d74b432fdff319bf
