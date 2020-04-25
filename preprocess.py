@@ -91,12 +91,11 @@ def main():
     # save the data in .npy files if valid
     train_images_path = 'train_images.npy'
     train_labels_path = 'train_labels.npy'
-    # save(train_images_path, images)
-    # save(train_labels_path, labels)
+    save(train_images_path, images)
+    save(train_labels_path, labels)
 
     # load it back in to test
-    x_train = load(train_images_path)
-    y_train = load(train_labels_path)
+    # x_train, y_train = load_np_data(train_images_path, train_labels_path)
 
 if (__name__ == '__main__'):
     main()
