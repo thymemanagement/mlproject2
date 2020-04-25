@@ -1,10 +1,13 @@
 import csv
 from enum import Enum
 from itertools import *
+import os
 import random
 
 import cv2
 import numpy as np
+
+TEST_IMG_DIR = os.path.join('Test_Image', 'Test_Image')
 
 #class to identify labels. Label.X produces the X label as does Label("x"). Label("x") can be used to verify label input.
 class Label(Enum):
@@ -34,7 +37,8 @@ def parse_training_selected(csv_path, img_path, selectors):
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
         for row in compress(csv_reader, selectors):
-            png_array.append(cv2.imread(img_path + row[0]))
+            IMG_PATH = os.path.join(img_path, row[0])
+            png_array.append(cv2.imread(IMG_PATH))
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
 
@@ -56,7 +60,8 @@ def parse_training_range(csv_path, img_path, start, end):
         csv_reader = csv.reader(csv_file, delimiter=',')
         next(csv_reader)
         for row in islice(csv_reader, start, end):
-            png_array.append(cv2.imread(img_path + row[0]))
+            IMG_PATH = os.path.join(img_path, row[0])
+            png_array.append(cv2.imread(IMG_PATH))
             y_array.append(Label(row[1]))
     return (np.asarray(png_array), np.asarray(y_array))
 
@@ -64,3 +69,10 @@ def parse_training_range(csv_path, img_path, start, end):
 #Do not recommend using. Will probably take up too much space and take a long time
 def parse_training_all(csv_path, img_path):
     return parse_training_selected(csv_path, img_path, repeat(True))
+
+def main():
+    png_array, y_array = parse_training_range('Train_Labels.csv', TEST_IMG_DIR, 4, 5)
+    print(png_array, y_array)
+    
+if (__name__ == '__main__'):
+    main()
