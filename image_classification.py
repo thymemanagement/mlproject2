@@ -64,14 +64,16 @@ CONSTANT = 64
 # initialize a sequential model
 model = Sequential()
 # add convolution layers to this model
-model.add(Conv2D(NUM_FILTERS, FILTER_SIZE, activation='relu', input_shape=(INPUT_SHAPE)))
+model.add(Conv2D(32, (3,3), activation='selu', input_shape=(INPUT_SHAPE)))
 model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Conv2D(NUM_FILTERS*2, FILTER_SIZE, activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='selu'))
+model.add(MaxPooling2D(pool_size=POOL_SIZE))
+model.add(Conv2D(64, (3, 3), activation='selu'))
 model.add(MaxPooling2D(pool_size=POOL_SIZE))
 model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
 # add fully connected layers
-model.add(Dense(CONSTANT*2, activation = 'relu'))
-model.add(Dense(CONSTANT//2, activation = 'sigmoid'))
+#model.add(Dense(CONSTANT*2, activation = 'relu'))
+#model.add(Dense(CONSTANT//2, activation = 'sigmoid'))
 # use softmax as we have multiple classifications
 model.add(Dense(10, activation='softmax'))
 model.summary
