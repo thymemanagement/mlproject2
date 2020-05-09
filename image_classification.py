@@ -4,6 +4,9 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers
+from keras import optimizers
+from keras import regularizers
+from keras import models
 from keras.models import Sequential, load_model
 from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten
 from keras.utils import to_categorical
@@ -16,6 +19,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from numpy import asarray
 from numpy import save
+from classification_models.keras import Classifiers
 
 train_images_path = './train_images.npy'
 train_labels_path = './train_labels.npy'
@@ -61,24 +65,39 @@ EPOCHS = 100
 BATCH_SIZE = 32
 CONSTANT = 64 
 
-# initialize a sequential model
-model = Sequential()
-# add convolution layers to this model
-model.add(Conv2D(32, (3,3), activation='selu', input_shape=(INPUT_SHAPE)))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Conv2D(64, (3, 3), activation='selu'))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Conv2D(64, (3, 3), activation='selu'))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
-# add fully connected layers
-#model.add(Dense(CONSTANT*2, activation = 'relu'))
-#model.add(Dense(CONSTANT//2, activation = 'sigmoid'))
-# use softmax as we have multiple classifications
-model.add(Dense(10, activation='softmax'))
-model.summary
+## initialize a sequential model
+#model = Sequential()
+## add convolution layers to this model
+#model.add(Conv2D(32, (3,3), activation='relu', input_shape=(INPUT_SHAPE)))
+##model.add(keras.layers.Dropout(0.01, noise_shape=None, seed=None))
+#model.add(MaxPooling2D(pool_size=POOL_SIZE))
+#model.add(Conv2D(32, (3, 3), activation='relu', activity_regularizer=keras.regularizers.l1(0.1)))
+#model.add(MaxPooling2D(pool_size=POOL_SIZE))
+#model.add(Conv2D(64, (3, 3), activation='relu', activity_regularizer=keras.regularizers.l1(0.1)))
+#model.add(MaxPooling2D(pool_size=POOL_SIZE))
+#model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
+## add fully connected layers
+##model.add(Dense(CONSTANT*2, activation = 'relu'))
+##model.add(Dense(CONSTANT//2, activation = 'sigmoid'))
+## use softmax as we have multiple classifications
+#model.add(Dense(10, activation='softmax'))
+#model.summary
 
-model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+n_classes = 10
+X = x_train
+ResNet34, preprocess_input = Classifiers.get('resnet34')
+
+# build model
+base_model = ResNet34(input_shape=(32,32,3), weights='imagenet', include_top=False)
+x = layers.GlobalAveragePooling2D()(base_model.output)
+output = layers.Dense(n_classes, activation='softmax')(x)
+model = models.Model(inputs=[base_model.input], outputs=[output])
+
+# train
+#model.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
+#model.fit(X, y)
+
+model.compile(loss='categorical_crossentropy', optimizer = 'SGD', metrics = ['accuracy'])
 history = model.fit(
     x_train,
     y_train,
