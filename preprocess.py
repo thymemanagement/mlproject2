@@ -71,9 +71,7 @@ def parse_training_all(csv_path, img_path):
     return parse_training_selected(csv_path, img_path, repeat(True))
 
 def load_np_data(image_path, labels_path):
-    x_train = load(image_path)
-    y_train = load(labels_path)
-    return (load(image_path), load(labels_path))
+    return (load(image_path, allow_pickle=True), load(labels_path, allow_pickle=True))
 
 def main():
     # load all of the train labels and images into np arrays "images" and "labels"
