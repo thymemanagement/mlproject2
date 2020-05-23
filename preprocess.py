@@ -8,7 +8,7 @@ import random
 import cv2
 import numpy as np
 
-TRAIN_IMG_DIR = os.path.join('Final_Train_Image')
+TRAIN_IMG_DIR = os.path.join('Test_Image')
 
 #class to identify labels. Label.X produces the X label as does Label("x"). Label("x") can be used to verify label input.
 class Label(Enum):
@@ -80,17 +80,17 @@ def main():
     images, labels = parse_training_all(csv_path, img_path)
 
     # reformat Label objects into strings for saving into .npy files
-    string_labels = []
-    for i in range(labels.size):
-        string_labels.append(labels[i].value)
+    # string_labels = []
+    # for i in range(labels.size):
+    #     string_labels.append(labels[i].value)
     
-    labels = np.asarray(string_labels)
+    # labels = np.asarray(string_labels)
 
     # save the data in .npy files if valid
-    train_images_path = 'train_images.npy'
-    train_labels_path = 'train_labels.npy'
+    train_images_path = 'test_images.npy'
+    # train_labels_path = 'test_labels.npy'
     save(train_images_path, images)
-    save(train_labels_path, labels)
+    # save(train_labels_path, labels)
 
     # load it back in to test
     # x_train, y_train = load_np_data(train_images_path, train_labels_path)
