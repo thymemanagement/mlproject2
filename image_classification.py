@@ -58,46 +58,33 @@ INPUT_SHAPE = x_train[0].shape
 print(INPUT_SHAPE)
 
 # define hyper parameters
-NUM_FILTERS = 8
+NUM_FILTERS = 32
 FILTER_SIZE = 3
 POOL_SIZE = 2
-EPOCHS = 100
-BATCH_SIZE = 32
+EPOCHS = 50
+BATCH_SIZE = 64 #64 or 128
 CONSTANT = 64 
 
-## initialize a sequential model
-#model = Sequential()
-## add convolution layers to this model
-#model.add(Conv2D(32, (3,3), activation='relu', input_shape=(INPUT_SHAPE)))
-##model.add(keras.layers.Dropout(0.01, noise_shape=None, seed=None))
-#model.add(MaxPooling2D(pool_size=POOL_SIZE))
-#model.add(Conv2D(32, (3, 3), activation='relu', activity_regularizer=keras.regularizers.l1(0.1)))
-#model.add(MaxPooling2D(pool_size=POOL_SIZE))
-#model.add(Conv2D(64, (3, 3), activation='relu', activity_regularizer=keras.regularizers.l1(0.1)))
-#model.add(MaxPooling2D(pool_size=POOL_SIZE))
-#model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
-## add fully connected layers
-##model.add(Dense(CONSTANT*2, activation = 'relu'))
-##model.add(Dense(CONSTANT//2, activation = 'sigmoid'))
-## use softmax as we have multiple classifications
-#model.add(Dense(10, activation='softmax'))
-#model.summary
+# initialize a sequential model
+model = Sequential()
+# add convolution layers to this model
+model.add(Conv2D(NUM_FILTERS*2, FILTER_SIZE, activation='relu', input_shape=(INPUT_SHAPE)))
+model.add(MaxPooling2D(pool_size=POOL_SIZE))
+model.add(Conv2D(NUM_FILTERS*4, FILTER_SIZE, activation='relu'))
+model.add(MaxPooling2D(pool_size=POOL_SIZE))
+model.add(Conv2D(NUM_FILTERS*8, FILTER_SIZE, activation='relu'))
+model.add(MaxPooling2D(pool_size=POOL_SIZE))
+model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
+# add fully connected layers
+model.add(Dense(CONSTANT*4, activation = 'relu'))
+# use softmax as we have multiple classifications
+model.add(Dense(10, activation='softmax'))
 
-n_classes = 10
-X = x_train
-ResNet34, preprocess_input = Classifiers.get('resnet34')
+model.summary()
 
-# build model
-base_model = ResNet34(input_shape=(32,32,3), weights='imagenet', include_top=False)
-x = layers.GlobalAveragePooling2D()(base_model.output)
-output = layers.Dense(n_classes, activation='softmax')(x)
-model = models.Model(inputs=[base_model.input], outputs=[output])
-
-# train
-#model.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
-#model.fit(X, y)
-
-model.compile(loss='categorical_crossentropy', optimizer = 'SGD', metrics = ['accuracy'])
+sgd = optimizers.SGD(lr=0.001, momentum=0.9)
+model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+#model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
 history = model.fit(
     x_train,
     y_train,
@@ -106,7 +93,6 @@ history = model.fit(
     verbose=2,
     validation_data=(x_test, y_test))
 
-# plot the results
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
 plt.title('Model Accuracy')
