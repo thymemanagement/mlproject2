@@ -114,3 +114,30 @@ plt.ylabel('Accuracy')
 plt.xlabel('Number of epochs')
 plt.legend(['accuracy', 'val_accuracy'], loc='upper left')
 plt.show()
+
+
+# load test images
+test_images_path = './train_labels.npy'
+test_images = load(test_images_path, allow_pickle=True)
+
+print('test_images.shape =', test_images.shape)
+print('test_images[0].shape =', test_images[0].shape)
+
+prediction = model.predict(test_images, batch_size=BATCH_SIZE, verbose=1)
+predicted = []
+files = []
+for i in range(1000):
+  temp = label_encoder.inverse_transform([argmax(prediction[i, :])])
+  predicted.append(temp[0])
+  files.append(str(i) + '.png')
+
+print(files[0])
+print(predicted[0])
+
+field_names = ['Image File Name', 'Test Label']
+submission = zip(files, predicted)
+with open('./submission.csv', mode='w') as file:
+    writer = csv.writer(file)
+    writer.writerow(field_names)
+    writer.writerows(submission)
+
