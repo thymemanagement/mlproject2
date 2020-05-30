@@ -73,11 +73,22 @@ def parse_training_all(csv_path, img_path):
 def load_np_data(image_path, labels_path):
     return (load(image_path, allow_pickle=True), load(labels_path, allow_pickle=True))
 
+# convert test images to numpy array to store in NPY file
+def test_image(num_images, img_path):
+    png_array = []
+    for i in range(0, num_images):
+        file_name = str(i) + ".png"
+
+        image_path = os.path.join(img_path, file_name)
+        png_array.append(cv2.imread(image_path))
+
+    return np.asarray(png_array)
+
 def main():
     # load all of the train labels and images into np arrays "images" and "labels"
-    csv_path = 'Train_Labels.csv'
-    img_path = TRAIN_IMG_DIR
-    images, labels = parse_training_all(csv_path, img_path)
+    # csv_path = 'Train_Labels.csv'
+    # img_path = TRAIN_IMG_DIR
+    # images, labels = parse_training_all(csv_path, img_path)
 
     # reformat Label objects into strings for saving into .npy files
     # string_labels = []
@@ -85,6 +96,8 @@ def main():
     #     string_labels.append(labels[i].value)
     
     # labels = np.asarray(string_labels)
+
+    images = test_image(1000, TRAIN_IMG_DIR)
 
     # save the data in .npy files if valid
     train_images_path = 'test_images.npy'
