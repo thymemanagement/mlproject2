@@ -53,46 +53,53 @@ print('Shape of y_train:', y_train.shape)
 print('Shape of x_test:', x_test.shape)
 print('Shape of y_test:', y_test.shape)
 
-# define parameters
-INPUT_SHAPE = x_train[0].shape
-print(INPUT_SHAPE)
-
-# define hyper parameters
-NUM_FILTERS = 32
-FILTER_SIZE = 3
-POOL_SIZE = 2
-EPOCHS = 50
-BATCH_SIZE = 64 #64 or 128
-CONSTANT = 64 
-
-# initialize a sequential model
+# define the model
 model = Sequential()
-# add convolution layers to this model
-model.add(Conv2D(NUM_FILTERS*2, FILTER_SIZE, activation='relu', input_shape=(INPUT_SHAPE)))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Conv2D(NUM_FILTERS*4, FILTER_SIZE, activation='relu'))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Conv2D(NUM_FILTERS*8, FILTER_SIZE, activation='relu'))
-model.add(MaxPooling2D(pool_size=POOL_SIZE))
-model.add(Flatten()) # convert 3D feature map into 1D feature vectors for input into fully connected
-# add fully connected layers
-model.add(Dense(CONSTANT*4, activation = 'relu'))
-# use softmax as we have multiple classifications
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(32, 32, 3)))
+model.add(BatchNormalization())
+
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
+
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.25))
+
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
+
+model.add(Flatten()) 
+
+model.add(Dense(512, activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.5))
+
+model.add(Dense(128, activation = 'relu'))
+model.add(BatchNormalization())
+model.add(Dropout(0.5))
+
 model.add(Dense(10, activation='softmax'))
 
 model.summary()
 
-sgd = optimizers.SGD(lr=0.001, momentum=0.9)
-model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
-#model.compile(loss='categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
+# setup parameters for compiling the model
+# use early stopping to stop the training if valudation accuracy does not change after 10 epochs
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.01, patience=10, verbose=1)
+model.compile(loss='categorical_crossentropy', optimizer = 'adagrad', metrics = ['accuracy'])
 history = model.fit(
     x_train,
     y_train,
-    epochs=EPOCHS, 
-    batch_size=BATCH_SIZE, 
+    epochs=100, 
+    batch_size=128, 
+    callbacks=[callback],
     verbose=2,
     validation_data=(x_test, y_test))
 
+# plot the results
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
 plt.title('Model Accuracy')
@@ -100,3 +107,42 @@ plt.ylabel('Accuracy')
 plt.xlabel('Number of epochs')
 plt.legend(['accuracy', 'val_accuracy'], loc='upper left')
 plt.show()
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model Loss') 
+plt.ylabel('Loss')
+plt.xlabel('Number of epochs')
+plt.legend(['loss', 'val_loss'], loc='upper left')
+plt.show()
+
+# load test images
+test_images_path = './test_images.npy'
+
+test_images = load(test_images_path, allow_pickle=True)
+
+print('test_images.shape =', test_images.shape)
+print('test_images[0].shape =', test_images[0].shape)
+
+# plot first image with its label to check if valid
+plt.imshow(test_images[0]);
+
+# create predictions for test images
+prediction = model.predict(test_images, batch_size=BATCH_SIZE, verbose=1)
+predicted = []
+files = []
+for i in range(1000):
+  temp = label_encoder.inverse_transform([argmax(prediction[i, :])])
+  predicted.append(temp[0])
+  files.append(str(i) + '.png')
+
+print(files[0])
+print(predicted[0])
+
+# create submission.csv file using these predicted labels
+field_names = ['Image File Name', 'Test Label']
+submission = zip(files, predicted)
+with open('./submission.csv', mode='w') as file:
+    writer = csv.writer(file)
+    writer.writerow(field_names)
+    writer.writerows(submission)
