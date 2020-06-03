@@ -6,3 +6,4 @@ opencv-python
 scikit-learn
 matplotlib
 image-classifiers==0.2.2
+imgaug
