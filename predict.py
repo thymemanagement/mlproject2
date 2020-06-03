@@ -1,3 +1,4 @@
+import csv
 import pickle
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
@@ -28,9 +29,15 @@ with open('cnn.pickle', 'rb') as file:
 prediction = history.predict(test_x)
 
 predict_labels = []
+files = []
 for i in range(1000):
-	print(i)
 	label = label_encoder.inverse_transform([np.argmax(prediction[i])])
-	predict_labels.append(label)
+	predict_labels.append(label[0])
+	files.append(str(i) + '.png')
 
-print(predict_labels)
+field_names = ['Image File Name', 'Test Label']
+submission = zip(files, predict_labels)
+with open('./submission.csv', mode='w') as file:
+    writer = csv.writer(file)
+    writer.writerow(field_names)
+    writer.writerows(submission)
