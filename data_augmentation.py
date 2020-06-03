@@ -6,6 +6,7 @@ from imgaug import augmenters as iaa
 import os
 
 from preprocess import parse_training_range
+from image_generation import 
 
 seq = iaa.Sequential([
     iaa.Fliplr(0.5),
@@ -32,9 +33,6 @@ def augment_data(images, labels, pipeline, count):
     return (np.array(new_images), np.array(new_labels))
 
 def main():
-    augment_images_path = 'augment_images.npy'
-    augment_labels_path = 'augment_labels.npy'
-    
     csv_path = 'Train_Labels.csv'
     img_path = 'Train_Image/Train_Image/'
     n = 5

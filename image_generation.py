@@ -1,4 +1,5 @@
 from preprocess import *
+from data_augmentation import *
   
 import numpy as np
 import tensorflow as tf
@@ -137,7 +138,7 @@ for predict in prediction:
   second = max(temp)
   if highest > confidence_threshold and second < difference_threshold:
     # append the image name to a list
-    candidates.append(str(curr_img) + ".png")
+    candidates.append(curr_img)
     print(curr_img, 'is a candidate with confidence =', highest, 'and second highest =', second)
   curr_img += 1
 
@@ -146,3 +147,26 @@ candidates = np.asarray(candidates)
 print('Candidates.shape =', candidates.shape)
 
 # if you can use this np array and create new .npy files that have more data that would be awesome
+
+def candidate_gen(cands):
+  i = 0
+  while True:
+    if i in cands:
+      yield True
+    else:
+      yield False
+    i += 1
+
+csv_path = 'Train_Labels.csv'
+img_path = 'Train_Image/Train_Image/'
+
+num_augments = 5
+images, labels = parse_training_selected(csv_path, img_path, candidate_gen(candidates))
+aug_images, aug_labels = augment_data(images, labels, seq, num_augments)
+
+augment_images_path = 'augment_images.npy'
+augment_labels_path = 'augment_labels.npy'
+
+save(augment_images_path, aug_images)
+save(augment_labels_path, aug_labels)
+
