@@ -8,7 +8,7 @@ from keras import optimizers
 from keras import regularizers
 from keras import models
 from keras.models import Sequential, load_model
-from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten
+from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten, BatchNormalization
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -19,7 +19,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from numpy import asarray
 from numpy import save
-from classification_models.keras import Classifiers
 
 train_images_path = './train_images.npy'
 train_labels_path = './train_labels.npy'
@@ -30,28 +29,28 @@ x_train, y_train = load_np_data(train_images_path, train_labels_path)
 # define example
 data = y_train
 values = array(data)
-print('values =', values)
+# print('values =', values)
 # integer encode
 label_encoder = LabelEncoder()
 integer_encoded = label_encoder.fit_transform(values)
-print('integer_encoded =', integer_encoded)
+# print('integer_encoded =', integer_encoded)
 # binary encode
 onehot_encoder = OneHotEncoder(sparse=False)
 integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
 onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
-print('onehot_encoded =', onehot_encoded)
+# print('onehot_encoded =', onehot_encoded)
 # invert first example
 inverted = label_encoder.inverse_transform([argmax(onehot_encoded[0, :])])
-print('inverted =',inverted)
+# print('inverted =',inverted)
 y_train = onehot_encoded
-print('y_train.shape =', y_train.shape)
+# print('y_train.shape =', y_train.shape)
 
 # initialize training and test data
 x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size = 0.20, random_state = 4)
-print('Shape of x_train:', x_train.shape)
-print('Shape of y_train:', y_train.shape)
-print('Shape of x_test:', x_test.shape)
-print('Shape of y_test:', y_test.shape)
+# print('Shape of x_train:', x_train.shape)
+# print('Shape of y_train:', y_train.shape)
+# print('Shape of x_test:', x_test.shape)
+# print('Shape of y_test:', y_test.shape)
 
 # define the model
 model = Sequential()
@@ -68,6 +67,12 @@ model.add(BatchNormalization())
 model.add(Dropout(0.25))
 
 model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+model.add(BatchNormalization())
+
+model.add(Conv2D(256, kernel_size=(3, 3), activation='relu'))
+model.add(BatchNormalization())
+
+model.add(Conv2D(512, kernel_size=(3, 3), activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
