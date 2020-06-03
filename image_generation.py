@@ -9,7 +9,7 @@ from keras import optimizers
 from keras import regularizers
 from keras import models
 from keras.models import Sequential, load_model
-from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten
+from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten, BatchNormalization
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -20,7 +20,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from numpy import asarray
 from numpy import save
-from classification_models.keras import Classifiers
 
 train_images_path = './train_images.npy'
 train_labels_path = './train_labels.npy'
@@ -118,7 +117,7 @@ plt.legend(['loss', 'val_loss'], loc='upper left')
 plt.show()
 
 # create a prediction array for test data set
-prediction = model.predict(x_test, batch_size=BATCH_SIZE, verbose=1)
+prediction = model.predict(x_test, verbose=1)
 print('prediction.shape =', prediction.shape)
 
 highest = 0
@@ -162,11 +161,14 @@ img_path = 'Train_Image/Train_Image/'
 
 num_augments = 5
 images, labels = parse_training_selected(csv_path, img_path, candidate_gen(candidates))
+print("augmenting " + str(len(candidates)) + " candidates")
 aug_images, aug_labels = augment_data(images, labels, seq, num_augments)
 
 augment_images_path = 'augment_images.npy'
 augment_labels_path = 'augment_labels.npy'
 
+print("writing augmented images to " + augment_images_path)
 save(augment_images_path, aug_images)
+print("writing augmented labels to " + augment_labels_path)
 save(augment_labels_path, aug_labels)
 
