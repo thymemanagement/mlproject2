@@ -8,7 +8,8 @@ from keras import optimizers
 from keras import regularizers
 from keras import models
 from keras.models import Sequential, load_model
-from keras.layers import Dense, LSTM, Dropout, Conv2D, MaxPooling2D, Flatten
+from keras.layers import Dense, LSTM, Dropout, Conv2D
+from keras.layers import MaxPooling2D, Flatten, BatchNormalization
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -19,11 +20,37 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from numpy import asarray
 from numpy import save
-from classification_models.keras import Classifiers
 
 train_images_path = './train_images.npy'
 train_labels_path = './train_labels.npy'
 x_train, y_train = load_np_data(train_images_path, train_labels_path)
+
+# append augmented data to existing x_train and y_train
+aug_images_path = 'augment_images.npy'
+aug_labels_path = 'augment_labels.npy'
+
+print('Before adding aug images...')
+print('x_train.shape =', x_train.shape)
+print('y_train.shape =', y_train.shape)
+
+aug_x_train, aug_y_train = load_np_data(aug_images_path, aug_labels_path)
+print('aug_y_train[0]=', aug_y_train[0])
+# convert Label.ANIMAL values to string
+print('Converting animal labels to strings')
+for i in range(aug_y_train.size):
+   aug_y_train[i] = aug_y_train[i].value
+print('aug_y_train[0]=', aug_y_train[0])
+
+print('aug_x_train.shape =', aug_x_train.shape)
+print('aug_y_train.shape =', aug_y_train.shape)
+
+x_train = np.append(x_train, aug_x_train, axis=0)
+y_train = np.append(y_train, aug_y_train, axis=0)
+
+print('After adding aug images...')
+print('x_train.shape =', x_train.shape)
+print('y_train.shape =', y_train.shape)
+
 
 # one hot encoding example from https://machinelearningmastery.com/how-to-one-hot-encode-sequence-data-in-python/
 # need to convert labels from strings to integers and integers to "binary class matrices"
@@ -98,6 +125,9 @@ history = model.fit(
     callbacks=[callback],
     verbose=2,
     validation_data=(x_test, y_test))
+
+# save this model for future use
+model.save("cnn(+aug).h5")
 
 # plot the results
 plt.plot(history.history['accuracy'])

@@ -47,7 +47,7 @@ y_train = onehot_encoded
 print('y_train.shape =', y_train.shape)
 
 # initialize training and test data
-x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size = 0.50, random_state = 5)
+x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size = 0.20, random_state = 5)
 print('Shape of x_train:', x_train.shape)
 print('Shape of y_train:', y_train.shape)
 print('Shape of x_test:', x_test.shape)
@@ -117,14 +117,14 @@ plt.legend(['loss', 'val_loss'], loc='upper left')
 plt.show()
 
 # create a prediction array for test data set
-prediction = model.predict(x_test, verbose=1)
+prediction = model.predict(x_train, verbose=1)
 print('prediction.shape =', prediction.shape)
 
 highest = 0
 highest_idx = 0
 second = 0
-confidence_threshold = 0.99
-difference_threshold = 0.01
+confidence_threshold = 0.90
+difference_threshold = 0.10
 candidates = []
 curr_img = 0
 # for each prediction array
@@ -163,6 +163,7 @@ num_augments = 5
 images, labels = parse_training_selected(csv_path, img_path, candidate_gen(candidates))
 print("augmenting " + str(len(candidates)) + " candidates")
 aug_images, aug_labels = augment_data(images, labels, seq, num_augments)
+print("shape of aug_images =", aug_images.shape)
 
 augment_images_path = 'augment_images.npy'
 augment_labels_path = 'augment_labels.npy'
