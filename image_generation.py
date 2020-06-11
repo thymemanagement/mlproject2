@@ -123,8 +123,8 @@ print('prediction.shape =', prediction.shape)
 highest = 0
 highest_idx = 0
 second = 0
-confidence_threshold = 0.95
-difference_threshold = 0.01
+confidence_threshold = 0.90
+difference_threshold = 0.10
 candidates = []
 curr_img = 0
 # for each prediction array
